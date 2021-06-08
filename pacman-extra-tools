@@ -1,38 +1,48 @@
 #!/usr/bin/bash
 
 help(){
-echo "This script gives you access to usefull pacman abilities not provided by pacman options.
-Use the program at your own risk and make sure to check pacman output before making changes to your System.
+echo "This script gives you an easy way to use useful pacman abilities not directly provided by pacman options.
+
 
 -h , --help
 	Shows help and quit Programm
 --info
 	Shows commands used by the script + explanations. Useful if you want to learn more about Pacman :)
+-a , --autoremove
+	Remove unessesary packages
 -r , --remove {Package name}
 	Remove a package (Wildcard support)
 	example: $0 --remove python2-*
 -i , --install {Package name}
 	Install a package (Wildcard support)
-	example: $0 --install python2-*
+	example: $0 --install python-*
 
+Use the Program at your own risk and please make sure to check the pacman output before making changes to your System.
 Script under GPL3 License https://github.com/LeSnake04/pacman-extra-tools/blob/main/LICENSE
 Bug reports, contributions, and feature Requests welcome at https://github.com/LeSnake04/pacman-extra-tools
 "	
 }
 
-ARGS=$(getopt -n $0 -o ahr:i: --long autoremove,help,remove:,install:,info -- "$@")
-#echo "Args: $ARGS + $@"
-for arg in $ARGS; do
-	echo $arg
-	case $arg in
-		-a | --autoremove )
-			echo autoremove
-		;;
-		# quit program at end of option
-		--) 
-			break
-		;;
-		*)
-			help
-	esac
-done
+ARGS=$(getopt -n $0 \
+ -o ahr:i: \
+ --long autoremove,help,remove:,install:,info \
+ -- "$@")
+echo "$ARGS"
+if [ "$ARGS" = " --" ]; then
+	help
+else 
+	for arg in $ARGS; do
+		echo $arg
+		case $arg in
+			-a | --autoremove )
+				echo autoremove
+			;;
+			# quit program at end of options
+			--) 
+				break
+			;;
+			*)
+				help
+		esac
+	done
+fi
