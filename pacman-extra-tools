@@ -26,11 +26,11 @@ for arg in $ARGS; do
 	echo $arg
 	case $arg in
 		-a | --autoremove )
-		echo autoremove
+			echo autoremove
 		;;
 		# quit program at end of option
 		--) 
-		break
+			break
 		;;
 		*)
 			help
