@@ -1,5 +1,7 @@
 # pacman-extra-tools (WIP)
-Easy access to useful hidden pacman functions.
+Provides easy access to useful hidden pacman functions.
+
+
 
 # Credits
 [Great tutorial for getopt](https://www.shellscript.sh/tips/getopt/)

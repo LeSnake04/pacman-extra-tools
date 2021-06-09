@@ -2,12 +2,12 @@
 
 help(){
 echo "This script gives you an easy way to use useful pacman abilities not directly provided by pacman options.
-
+It does not aim to replace pacman.
 
 -h , --help
 	Shows help and quit Programm
---info
-	Shows commands used by the script + explanations. Useful if you want to learn more about Pacman :)
+-I , --info
+	Shows more Information about this script. Useful if you want to learn more about Pacman :)
 -a , --autoremove
 	Remove unessesary packages
 -r , --remove {Package name}
@@ -15,16 +15,32 @@ echo "This script gives you an easy way to use useful pacman abilities not direc
 	example: $0 --remove python2-*
 -i , --install {Package name}
 	Install a package (Wildcard support)
-	example: $0 --install python-*
+	example: $0 --install xfce4-*-plugin
 
+If you do not need wildcard, please use pacman or paru instead
 Use the Program at your own risk and please make sure to check the pacman output before making changes to your System.
 Script under GPL3 License https://github.com/LeSnake04/pacman-extra-tools/blob/main/LICENSE
 Bug reports, contributions, and feature requests welcome at https://github.com/LeSnake04/pacman-extra-tools
 "	
 }
 
+info(){
+	echo "After having to search for many pacman hidden functions myself, i decided to help others by giving others by giving them an easy way to use the functions i found. :)
+if you dont trust my script and want to use the functions directly, you are welcome to copy the lines from here:
+
+Autoremove:
+TODO: Autoremove command
+
+Install:
+sudo pacman -Sy $(pacman -Ssq | grep SEARCH_TERM )
+
+Remove:
+sudo pacman -Rsu $(pacman -Qq | grep SEARCH_TERM )
+	"
+}
+
 ARGS=$(getopt -n $0 \
- -o ahr:i: \
+ -o ahr:i:I \
  --long autoremove,help,remove:,install:,info \
  -- "$@")
 echo "$ARGS"
@@ -37,6 +53,8 @@ else
 			-a | --autoremove )
 				echo autoremove
 			;;
+			-I --info )
+				echo
 			# quit program at end of options
 			--) 
 				break
