@@ -40,16 +40,21 @@ $INFOTPUTBOLD
 $INFOTPUT
 	Remove unessesary packages
 $INFOTPUTBOLD
--r , --remove {Package name}
+-r , --remove {Sertch term}
 $INFOTPUT
-	Remove a package (Wildcard support)
+	Remove all packages matching a term
 	examples: 
-	$0 --remove python2-*
+	$0 --remove python2
+	If you only want to remove packages beginning with the term:
+	$0 --remove ^python2
 $INFOTPUTBOLD
--i , --install {Package name}
+-i , --install {Search term}
 $INFOTPUT
-	Install a package (Wildcard support)
-	example: $0 --install xfce4-*-plugin
+	Install all packages matching a term 
+	example: $0 --install xfce4
+
+
+You can use multiple operations at once
 
 $LOGTPUT
 If you do not need wildcard for installing or removing packages, I strongly recommend using pacman or your prefered pacman wrapper instead (I personally use 'paru').
@@ -61,17 +66,17 @@ $TPUTRESET"
 }
 
 info() {
-echo "${INFOTPUT}After having to search for many pacman hidden functions myself, i decided to help others by giving others by giving them an easy way to use the functions i found. :)
-if you dont trust my script and want to use the functions directly, you are welcome to copy the lines from here:
+echo "${INFOTPUT}After having to search for many pacman hidden functions myself, i decided to help others by giving them by giving them an easy way to use the functions i found. :)
+If you dont trust my script and want to use the functions directly instead, you are welcome to copy the lines from here:
 
 Autoremove:
-TODO: Autoremove command
+sudo pacman -Rns \$(pacman -Qtdq)
 
 Install:
 sudo pacman -Sy \$(pacman -Ssq | grep SEARCH_TERM )
 
 Remove:
-sudo pacman -Rsu \$(pacman -Qq | grep SEARCH_TERM )"
+sudo pacman -Rsu \$(pacman -Qq | grep SEARCH_TERM )$TPUTRESET"
 }
 
 askconfirmaction() {
@@ -81,21 +86,21 @@ askconfirmaction() {
 	#echo "i $ac_pkgs"
 
 	if [[ "$ac_pkgs" == "" ]]; then
-		echo "${ERRORTPUT}No Packages found matching ${ac_pkgs}${TPUTRESET}"
+		echo "${ERRORTPUT}No Packages found matching $argvar, Quitting ... ${ac_pkgs}${TPUTRESET}"
 		exit 1
 	fi
 
 	printf "$USERINPUTTPUT$ac_question \n$ac_pkgs\n\n[Y/n]"
 	read -r -n 1 ac_input
 	printf "\n$TPUTRESET"
-		case $ac_input in
-			[nN])
-				echo "${ERRORTPUT}Operation canceled by User$TPUTRESET"
-				exit 2
-			;;
-			*)
-				ac_output="1"
-		esac
+	case $ac_input in
+		[nN])
+			echo "${ERRORTPUT}Operation canceled by User, Quitting ...$TPUTRESET"
+			exit 2
+		;;
+		*)
+			ac_output="1"
+	esac
 	return 0
 }
 
@@ -131,30 +136,57 @@ for arg in $ARGS; do
 	
 	case $arg in
 		-a | --autoremove )
-			echo autoremove
+			echo "${INFOTPUT}Searching for unused Packages... $TPUTRESET"
+			pkgs=$(pacman -Qtdq)
+
+         # check if unused packages found
+			if [[ "$pkgs" == "" ]]; then
+            echo "$INFOTPUTBOLD Good news! No unused Packages found :)"
+         else
+            # Ask for confirmation from User
+            printf "$USERINPUTTPUT Remove the Following packages? \n$INFOTPUT$pkgs\n\n$USERINPUTTPUT[Y/n]"
+            read -r -n 1 ac_input
+            printf "\n$TPUTRESET"
+            case $ac_input in
+               [nN])
+                  echo "${ERRORTPUT}Operation canceled by User$TPUTRESET"
+                  exit 2
+               ;;
+               *)
+                  sudo pacman -Rsu $pkgs
+            esac
+         fi
 		;;
 		-I | --info )
-			echo Info
 			info
+         exit 0
 		;;
 		# quit program at end of options
 		--) 
-			exit
+			exit 0
 		;;
 		-r | --remove )
 			skip_next=true
 			echo "${INFOTPUT}Searching for packages matching ${argvar} ...${TPUTRESET}"
-			pacman -Qq
-			#pkgs=$(pacman -Qq | grep $argvar)
+			#FIXME packages somehow not listed, even thoug it works on terminal
+			pkgs=$(pacman -Qq | grep "$argvar" )
 			echo "pkgs: $pkgs"
-			askconfirmaction "You are about to remove the following packages:" $(pacman -Qq | grep "$argvar")
+			askconfirmaction "You are about to remove the following packages:" $pkgs
 			if [ "$ac_output" == "1" ]; then
-				echo "$pkgs" | sudo pacman -Rsu
+				sudo pacman -Rsu $pkgs
 			fi
 		;;
 		-i | --install )
-			pacman -Ssq | grep $argvar | sudo pacman -S -
 			skip_next=true
+			echo "${INFOTPUT}Searching for packages matching ${argvar} ...${TPUTRESET}"
+			pacman -Ssq $argvar
+         #FIXME packages somehow not listed
+			pkgs=$(pacman -Ssq | grep $argvar )
+			echo "pkgs: $pkgs"
+			askconfirmaction "You are about to remove the following packages:" "$pkgs"
+			if [ "$ac_output" == "1" ]; then
+				sudo pacman -Sy $pkgs
+			fi
 		;;
 		*)
 			help
