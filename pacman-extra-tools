@@ -1,26 +1,26 @@
 #!/usr/bin/bash
 
 if [ -f /usr/bin/tput ]; then
-	#Basic set of tput commands
-	#formating
-	TPUTBOLD="$(tput bold)" # bold
-	TPUTDIM="$(tput dim)" # 
-	TPUTRESET="$(tput sgr 0)" # default format 
-	TPUTITALIC="$(tput sitm)" # italic
-	TPUTBLINK="$(tput sitm)" # blink
-	TPUTLIGHT="$(tput smso)" # Color becomes background color
-	#colors
-	TPUTGREEN="$(tput setaf 2)" # green
-	TPUTRED="$(tput setaf 1)" # red
-	TPUTBLUE="$(tput setaf 6)" # blue
-	TPUTGREY="$(tput setaf 241)" # grey
+   #Basic set of tput commands
+   #formating
+   TPUTBOLD="$(tput bold)" # bold
+   TPUTDIM="$(tput dim)" # 
+   TPUTRESET="$(tput sgr 0)" # default format 
+   TPUTITALIC="$(tput sitm)" # italic
+   TPUTBLINK="$(tput sitm)" # blink
+   TPUTLIGHT="$(tput smso)" # Color becomes background color
+   #colors
+   TPUTGREEN="$(tput setaf 2)" # green
+   TPUTRED="$(tput setaf 1)" # red
+   TPUTBLUE="$(tput setaf 6)" # blue
+   TPUTGREY="$(tput setaf 241)" # grey
 
-	#tput presets 
-	USERINPUTTPUT="${TPUTRESET}${TPUTGREEN}${TPUTBOLD}" #user inputs
-	LOGTPUT="${TPUTRESET}${TPUTGREY}${TPUTITALIC} " #advanced logging 
-	ERRORTPUT="${TPUTRESET}${TPUTBOLD}${TPUTRED} " #errors
-	INFOTPUT="${TPUTRESET}${TPUTBLUE}" #logging 
-	INFOTPUTBOLD="${TPUTRESET}${TPUTBLUE}${TPUTBOLD}" #logging
+   #tput presets 
+   USERINPUTTPUT="${TPUTRESET}${TPUTGREEN}${TPUTBOLD}" #user inputs
+   LOGTPUT="${TPUTRESET}${TPUTGREY}${TPUTITALIC} " #advanced logging 
+   ERRORTPUT="${TPUTRESET}${TPUTBOLD}${TPUTRED} " #errors
+   INFOTPUT="${TPUTRESET}${TPUTBLUE}" #logging 
+   INFOTPUTBOLD="${TPUTRESET}${TPUTBLUE}${TPUTBOLD}" #logging
 fi
 
 help(){
@@ -28,31 +28,30 @@ echo "$INFOTPUT
 This script gives you an easy way to use useful pacman abilities not directly provided by pacman options.
 
 $INFOTPUTBOLD
-h , --help
-$INFOTPUT
-	Shows help and quits
+h , --help${INFOTPUT}
+  Shows help and quits
 $INFOTPUTBOLD
--I , --info
-$INFOTPUT
-	Shows commands used by script. Useful if you want to learn more about Pacman :)
+-I , --info${INFOTPUT}
+  Shows commands used by script. Useful if you want to learn more about Pacman :)
 $INFOTPUTBOLD
--a , --autoremove
-$INFOTPUT
-	Remove unessesary packages
+-a , --autoremove${INFOTPUT}
+  Remove unessesary packages
 $INFOTPUTBOLD
--r , --remove {Sertch term}
-$INFOTPUT
-	Remove all packages matching a term
-	examples: 
-	$0 --remove python2
-	If you only want to remove packages beginning with the term:
-	$0 --remove ^python2
-$INFOTPUTBOLD
--i , --install {Search term}
-$INFOTPUT
-	Install all packages matching a term 
-	example: $0 --install xfce4
+-r , --remove {Search Term}${INFOTPUT}
+  Remove all packages matching a term
 
+  Examples: 
+    $0 --remove python2
+  If you only want to remove packages beginning with the term:
+    $0 --remove ^python2
+$INFOTPUTBOLD
+-i , --install {Search Term}${INFOTPUT}
+  Install all packages matching a term
+    
+  Examples:
+    $0 --install xfce4
+  If you only want to remove packages beginning with the term:
+    $0 --install ^xfce4
 
 You can use multiple operations at once
 
@@ -80,28 +79,28 @@ sudo pacman -Rsu \$(pacman -Qq | grep SEARCH_TERM )$TPUTRESET"
 }
 
 askconfirmaction() {
-	ac_question=$1
-	#echo "q $ac_question"
-	ac_pkgs=$2
-	#echo "i $ac_pkgs"
+   ac_question=$1
+   #echo "q $ac_question"
+   ac_pkgs=$2
+   #echo "i $ac_pkgs"
 
-	if [[ "$ac_pkgs" == "" ]]; then
-		echo "${ERRORTPUT}No Packages found matching $argvar, Quitting ... ${ac_pkgs}${TPUTRESET}"
-		exit 1
-	fi
+   if [[ "$ac_pkgs" == "" ]]; then
+      echo "${ERRORTPUT}No Packages found matching $argvar, Quitting ... ${ac_pkgs}${TPUTRESET}"
+      exit 1
+   fi
 
-	printf "$USERINPUTTPUT$ac_question \n$ac_pkgs\n\n[Y/n]"
-	read -r -n 1 ac_input
-	printf "\n$TPUTRESET"
-	case $ac_input in
-		[nN])
-			echo "${ERRORTPUT}Operation canceled by User, Quitting ...$TPUTRESET"
-			exit 2
-		;;
-		*)
-			ac_output="1"
-	esac
-	return 0
+   printf "$USERINPUTTPUT$ac_question \n$ac_pkgs\n\n[Y/n]"
+   read -r -n 1 ac_input
+   printf "\n$TPUTRESET"
+   case $ac_input in
+      [nN])
+         echo "${ERRORTPUT}Operation canceled by User, Quitting ...$TPUTRESET"
+         exit 2
+      ;;
+      *)
+         ac_output="1"
+   esac
+   return 0
 }
 
 ARGS=$(getopt -n "$0" \
@@ -114,33 +113,33 @@ IFS=' ' read -ra ARGS_ARRAY <<< "$ARGS"
 
 # detect if no command given
 if [ "$ARGS" = " --" ]; then
-	help
-	exit 0
+   help
+   exit 0
 fi 
-	
+   
 argvarpos=0
 skip_next=false
 for arg in $ARGS; do
-	if [ $skip_next = true ]; then
-		skip_next=false
-		#echo "$arg already used as argument, skipping"
-		continue
-	fi
-	
-	# get value of potential argument
-	argvarpos=$((argvarpos + 1))
-	#echo "argvarpos: $argvarpos"
-	argvar=${ARGS_ARRAY[$argvarpos]}
-	#echo "argvar: $argvar"
-	#echo "arg: $arg"
-	
-	case $arg in
-		-a | --autoremove )
-			echo "${INFOTPUT}Searching for unused Packages... $TPUTRESET"
-			pkgs=$(pacman -Qtdq)
+   if [ $skip_next = true ]; then
+      skip_next=false
+      #echo "$arg already used as argument, skipping"
+      continue
+   fi
+   
+   # get value of potential argument
+   argvarpos=$((argvarpos + 1))
+   #echo "argvarpos: $argvarpos"
+   argvar=${ARGS_ARRAY[$argvarpos]}
+   #echo "argvar: $argvar"
+   #echo "arg: $arg"
+   
+   case $arg in
+      -a | --autoremove )
+         echo "${INFOTPUT}Searching for unused Packages... $TPUTRESET"
+         pkgs=$(pacman -Qtdq)
 
          # check if unused packages found
-			if [[ "$pkgs" == "" ]]; then
+         if [[ "$pkgs" == "" ]]; then
             echo "$INFOTPUTBOLD Good news! No unused Packages found :)"
          else
             # Ask for confirmation from User
@@ -156,39 +155,39 @@ for arg in $ARGS; do
                   sudo pacman -Rsu $pkgs
             esac
          fi
-		;;
-		-I | --info )
-			info
+      ;;
+      -I | --info )
+         info
          exit 0
-		;;
-		# quit program at end of options
-		--) 
-			exit 0
-		;;
-		-r | --remove )
-			skip_next=true
-			echo "${INFOTPUT}Searching for packages matching ${argvar} ...${TPUTRESET}"
-			#FIXME packages somehow not listed, even thoug it works on terminal
-			pkgs=$(pacman -Qq | grep "$argvar" )
-			echo "pkgs: $pkgs"
-			askconfirmaction "You are about to remove the following packages:" $pkgs
-			if [ "$ac_output" == "1" ]; then
-				sudo pacman -Rsu $pkgs
-			fi
-		;;
-		-i | --install )
-			skip_next=true
-			echo "${INFOTPUT}Searching for packages matching ${argvar} ...${TPUTRESET}"
-			pacman -Ssq $argvar
+      ;;
+      # quit program at end of options
+      --) 
+         exit 0
+      ;;
+      -r | --remove )
+         skip_next=true
+         echo "${INFOTPUT}Searching for packages matching ${argvar} ...${TPUTRESET}"
+         #FIXME packages somehow not listed, even thoug it works on terminal
+         pkgs=$(pacman -Qq | grep "$argvar" )
+         echo "pkgs: $pkgs"
+         askconfirmaction "You are about to remove the following packages:" $pkgs
+         if [ "$ac_output" == "1" ]; then
+            sudo pacman -Rsu $pkgs
+         fi
+      ;;
+      -i | --install )
+         skip_next=true
+         echo "${INFOTPUT}Searching for packages matching ${argvar} ...${TPUTRESET}"
+         pacman -Ssq $argvar
          #FIXME packages somehow not listed
-			pkgs=$(pacman -Ssq | grep $argvar )
-			echo "pkgs: $pkgs"
-			askconfirmaction "You are about to remove the following packages:" "$pkgs"
-			if [ "$ac_output" == "1" ]; then
-				sudo pacman -Sy $pkgs
-			fi
-		;;
-		*)
-			help
-	esac
+         pkgs=$(pacman -Ssq | grep $argvar )
+         echo "pkgs: $pkgs"
+         askconfirmaction "You are about to remove the following packages:" "$pkgs"
+         if [ "$ac_output" == "1" ]; then
+            sudo pacman -Sy $pkgs
+         fi
+      ;;
+      *)
+         help
+   esac
 done
