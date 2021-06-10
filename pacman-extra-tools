@@ -1,66 +1,162 @@
 #!/usr/bin/bash
 
-help(){
-echo "This script gives you an easy way to use useful pacman abilities not directly provided by pacman options.
-It does not aim to replace pacman.
+if [ -f /usr/bin/tput ]; then
+	#Basic set of tput commands
+	#formating
+	TPUTBOLD="$(tput bold)" # bold
+	TPUTDIM="$(tput dim)" # 
+	TPUTRESET="$(tput sgr 0)" # default format 
+	TPUTITALIC="$(tput sitm)" # italic
+	TPUTBLINK="$(tput sitm)" # blink
+	TPUTLIGHT="$(tput smso)" # Color becomes background color
+	#colors
+	TPUTGREEN="$(tput setaf 2)" # green
+	TPUTRED="$(tput setaf 1)" # red
+	TPUTBLUE="$(tput setaf 6)" # blue
+	TPUTGREY="$(tput setaf 241)" # grey
 
--h , --help
-	Shows help and quit Programm
+	#tput presets 
+	USERINPUTTPUT="${TPUTRESET}${TPUTGREEN}${TPUTBOLD}" #user inputs
+	LOGTPUT="${TPUTRESET}${TPUTGREY}${TPUTITALIC} " #advanced logging 
+	ERRORTPUT="${TPUTRESET}${TPUTBOLD}${TPUTRED} " #errors
+	INFOTPUT="${TPUTRESET}${TPUTBLUE}" #logging 
+	INFOTPUTBOLD="${TPUTRESET}${TPUTBLUE}${TPUTBOLD}" #logging
+fi
+
+help(){
+echo "$INFOTPUT
+This script gives you an easy way to use useful pacman abilities not directly provided by pacman options.
+
+$INFOTPUTBOLD
+h , --help
+$INFOTPUT
+	Shows help and quits
+$INFOTPUTBOLD
 -I , --info
-	Shows more Information about this script. Useful if you want to learn more about Pacman :)
+$INFOTPUT
+	Shows commands used by script. Useful if you want to learn more about Pacman :)
+$INFOTPUTBOLD
 -a , --autoremove
+$INFOTPUT
 	Remove unessesary packages
+$INFOTPUTBOLD
 -r , --remove {Package name}
+$INFOTPUT
 	Remove a package (Wildcard support)
-	example: $0 --remove python2-*
+	examples: 
+	$0 --remove python2-*
+$INFOTPUTBOLD
 -i , --install {Package name}
+$INFOTPUT
 	Install a package (Wildcard support)
 	example: $0 --install xfce4-*-plugin
 
-If you do not need wildcard, please use pacman or paru instead
+$LOGTPUT
+If you do not need wildcard for installing or removing packages, I strongly recommend using pacman or your prefered pacman wrapper instead (I personally use 'paru').
 Use the Program at your own risk and please make sure to check the pacman output before making changes to your System.
-Script under GPL3 License https://github.com/LeSnake04/pacman-extra-tools/blob/main/LICENSE
+
+This Script under GPL3 License https://github.com/LeSnake04/pacman-extra-tools/blob/main/LICENSE
 Bug reports, contributions, and feature requests welcome at https://github.com/LeSnake04/pacman-extra-tools
-"	
+$TPUTRESET"	
 }
 
-info(){
-	echo "After having to search for many pacman hidden functions myself, i decided to help others by giving others by giving them an easy way to use the functions i found. :)
+info() {
+echo "${INFOTPUT}After having to search for many pacman hidden functions myself, i decided to help others by giving others by giving them an easy way to use the functions i found. :)
 if you dont trust my script and want to use the functions directly, you are welcome to copy the lines from here:
 
 Autoremove:
 TODO: Autoremove command
 
 Install:
-sudo pacman -Sy $(pacman -Ssq | grep SEARCH_TERM )
+sudo pacman -Sy \$(pacman -Ssq | grep SEARCH_TERM )
 
 Remove:
-sudo pacman -Rsu $(pacman -Qq | grep SEARCH_TERM )
-	"
+sudo pacman -Rsu \$(pacman -Qq | grep SEARCH_TERM )"
 }
 
-ARGS=$(getopt -n $0 \
+askconfirmaction() {
+	ac_question=$1
+	#echo "q $ac_question"
+	ac_pkgs=$2
+	#echo "i $ac_pkgs"
+
+	if [[ "$ac_pkgs" == "" ]]; then
+		echo "${ERRORTPUT}No Packages found matching ${ac_pkgs}${TPUTRESET}"
+		exit 1
+	fi
+
+	printf "$USERINPUTTPUT$ac_question \n$ac_pkgs\n\n[Y/n]"
+	read -r -n 1 ac_input
+	printf "\n$TPUTRESET"
+		case $ac_input in
+			[nN])
+				echo "${ERRORTPUT}Operation canceled by User$TPUTRESET"
+				exit 2
+			;;
+			*)
+				ac_output="1"
+		esac
+	return 0
+}
+
+ARGS=$(getopt -n "$0" \
  -o ahr:i:I \
  --long autoremove,help,remove:,install:,info \
  -- "$@")
-echo "$ARGS"
+#echo "$ARGS"
+# parse ARGS into an array
+IFS=' ' read -ra ARGS_ARRAY <<< "$ARGS"
+
+# detect if no command given
 if [ "$ARGS" = " --" ]; then
 	help
-else 
-	for arg in $ARGS; do
-		echo $arg
-		case $arg in
-			-a | --autoremove )
-				echo autoremove
-			;;
-			-I --info )
-				echo
-			# quit program at end of options
-			--) 
-				break
-			;;
-			*)
-				help
-		esac
-	done
-fi
+	exit 0
+fi 
+	
+argvarpos=0
+skip_next=false
+for arg in $ARGS; do
+	if [ $skip_next = true ]; then
+		skip_next=false
+		#echo "$arg already used as argument, skipping"
+		continue
+	fi
+	
+	# get value of potential argument
+	argvarpos=$((argvarpos + 1))
+	#echo "argvarpos: $argvarpos"
+	argvar=${ARGS_ARRAY[$argvarpos]}
+	#echo "argvar: $argvar"
+	#echo "arg: $arg"
+	
+	case $arg in
+		-a | --autoremove )
+			echo autoremove
+		;;
+		-I | --info )
+			echo Info
+			info
+		;;
+		# quit program at end of options
+		--) 
+			exit
+		;;
+		-r | --remove )
+			skip_next=true
+			echo "${INFOTPUT}Searching for packages matching ${argvar} ...${TPUTRESET}"
+			pacman -Qq
+			#pkgs=$(pacman -Qq | grep $argvar)
+			echo "pkgs: $pkgs"
+			askconfirmaction "You are about to remove the following packages:" $(pacman -Qq | grep "$argvar")
+			if [ "$ac_output" == "1" ]; then
+				echo "$pkgs" | sudo pacman -Rsu
+			fi
+		;;
+		-i | --install )
+			pacman -Ssq | grep $argvar | sudo pacman -S -
+			skip_next=true
+		;;
+		*)
+			help
+	esac
+done
