@@ -179,7 +179,7 @@ for arg in $ARGS; do
          skip_next=true
          echo "${INFOTPUT}Searching for packages matching ${argvar} ...${TPUTRESET}"
          pacman -Ssq $argvar
-         #FIXME packages somehow not listed
+         #FIXME packages somehow not listed, even thoug it works on terminal
          pkgs=$(pacman -Ssq | grep $argvar )
          echo "pkgs: $pkgs"
          askconfirmaction "You are about to remove the following packages:" "$pkgs"
