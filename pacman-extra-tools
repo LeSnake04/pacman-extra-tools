@@ -108,7 +108,7 @@ ARGS=$(getopt -n "$0" \
  --long autoremove,help,remove:,install:,info \
  -- "$@")
 #echo "$ARGS"
-# parse ARGS into an array
+# Parse ARGS into an array
 IFS=' ' read -ra ARGS_ARRAY <<< "$ARGS"
 
 # Detect if no command given
