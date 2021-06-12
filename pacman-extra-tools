@@ -126,7 +126,7 @@ for arg in $ARGS; do
       continue
    fi
    
-   # get value of potential argument
+   # Get value of potential argument
    argvarpos=$((argvarpos + 1))
    #echo "argvarpos: $argvarpos"
    argvar=${ARGS_ARRAY[$argvarpos]}
