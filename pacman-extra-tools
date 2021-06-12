@@ -111,7 +111,7 @@ ARGS=$(getopt -n "$0" \
 # parse ARGS into an array
 IFS=' ' read -ra ARGS_ARRAY <<< "$ARGS"
 
-# detect if no command given
+# Detect if no command given
 if [ "$ARGS" = " --" ]; then
    help
    exit 0
