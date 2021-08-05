@@ -1,0 +1,14 @@
+{
+   "info":{ 
+      
+   },
+   "commands":{
+         "general":{
+               "install":"sudo pacman -Sy INPUT",
+               "autoremove":"sudo pacman -Rns $(pacman -Qtdq)",
+               "remove":"sudo pacman -Rsu $(pacman -Qqs INPUT)""
+            }
+      }
+      }
+   }
+}

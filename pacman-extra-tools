@@ -107,10 +107,9 @@ ARGS=$(getopt -n "$0" \
  -o ahr:i:I \
  --long autoremove,help,remove:,install:,info \
  -- "$@")
-#echo "$ARGS"
+echo "$ARGS"
 # Parse ARGS into an array
 IFS=' ' read -ra ARGS_ARRAY <<< "$ARGS"
-
 # Detect if no command given
 if [ "$ARGS" = " --" ]; then
    help
@@ -120,7 +119,7 @@ fi
 argvarpos=0
 skip_next=false
 for arg in $ARGS; do
-   if [ $skip_next = true ]; then
+   if [ $skip_next ]; then
       skip_next=false
       #echo "$arg already used as argument, skipping"
       continue
@@ -128,10 +127,10 @@ for arg in $ARGS; do
    
    # Get value of potential argument
    argvarpos=$((argvarpos + 1))
-   #echo "argvarpos: $argvarpos"
+   echo "argvarpos: $argvarpos"
    argvar=${ARGS_ARRAY[$argvarpos]}
-   #echo "argvar: $argvar"
-   #echo "arg: $arg"
+   echo "argvar: $argvar"
+   echo "arg: $arg"
    
    case $arg in
       -a | --autoremove )
