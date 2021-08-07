@@ -4,8 +4,8 @@ if [ -f /usr/bin/tput ]; then
    #Basic set of tput commands
    #formating
    TPUTBOLD="$(tput bold)" # bold
-   TPUTDIM="$(tput dim)" # 
-   TPUTRESET="$(tput sgr 0)" # default format 
+   TPUTDIM="$(tput dim)" #
+   TPUTRESET="$(tput sgr 0)" # default format
    TPUTITALIC="$(tput sitm)" # italic
    TPUTBLINK="$(tput sitm)" # blink
    TPUTLIGHT="$(tput smso)" # Color becomes background color
@@ -15,11 +15,11 @@ if [ -f /usr/bin/tput ]; then
    TPUTBLUE="$(tput setaf 6)" # blue
    TPUTGREY="$(tput setaf 241)" # grey
 
-   #tput presets 
+   #tput presets
    USERINPUTTPUT="${TPUTRESET}${TPUTGREEN}${TPUTBOLD}" #user inputs
-   LOGTPUT="${TPUTRESET}${TPUTGREY}${TPUTITALIC} " #advanced logging 
+   LOGTPUT="${TPUTRESET}${TPUTGREY}${TPUTITALIC} " #advanced logging
    ERRORTPUT="${TPUTRESET}${TPUTBOLD}${TPUTRED} " #errors
-   INFOTPUT="${TPUTRESET}${TPUTBLUE}" #logging 
+   INFOTPUT="${TPUTRESET}${TPUTBLUE}" #logging
    INFOTPUTBOLD="${TPUTRESET}${TPUTBLUE}${TPUTBOLD}" #logging
 fi
 
@@ -40,14 +40,14 @@ $INFOTPUTBOLD
 -r , --remove {Search Term}${INFOTPUT}
   Remove all packages matching a term
 
-  Examples: 
+  Examples:
     $0 --remove python2
   If you only want to remove packages beginning with the term:
     $0 --remove ^python2
 $INFOTPUTBOLD
 -i , --install {Search Term}${INFOTPUT}
   Install all packages matching a term
-    
+
   Examples:
     $0 --install xfce4
   If you only want to remove packages beginning with the term:
@@ -61,7 +61,7 @@ Use the Program at your own risk and please make sure to check the pacman output
 
 This Script under GPL3 License https://github.com/LeSnake04/pacman-extra-tools/blob/main/LICENSE
 Bug reports, contributions, and feature requests welcome at https://github.com/LeSnake04/pacman-extra-tools
-$TPUTRESET"	
+$TPUTRESET"
 }
 
 info() {
@@ -114,8 +114,8 @@ IFS=' ' read -ra ARGS_ARRAY <<< "$ARGS"
 if [ "$ARGS" = " --" ]; then
    help
    exit 0
-fi 
-   
+fi
+
 argvarpos=0
 skip_next=false
 for arg in $ARGS; do
@@ -124,14 +124,14 @@ for arg in $ARGS; do
       #echo "$arg already used as argument, skipping"
       continue
    fi
-   
+
    # Get value of potential argument
    argvarpos=$((argvarpos + 1))
    echo "argvarpos: $argvarpos"
    argvar=${ARGS_ARRAY[$argvarpos]}
    echo "argvar: $argvar"
    echo "arg: $arg"
-   
+
    case $arg in
       -a | --autoremove )
          echo "${INFOTPUT}Searching for unused Packages... $TPUTRESET"
@@ -160,7 +160,7 @@ for arg in $ARGS; do
          exit 0
       ;;
       # quit program at end of options
-      --) 
+      --)
          exit 0
       ;;
       -r | --remove )
