@@ -9,7 +9,6 @@ class Log:
 	def __init__(self, loglevel: Union[str, int], stage: str):
 		loglevelids = self.loglevelids()
 		loglevels = self.__loglevels()
-		self.stage = stage
 		self.loglevel = loglevel
 		self.enabledlevels = {}
 
@@ -18,8 +17,10 @@ class Log:
 		for i in loglevels[loglevel].keys():
 			self.enabledlevels[i] = loglevels[loglevel][i]
 
+		self.stage = "INITLOGGER"
 		self.advanced('Started logger for Stage ' + stage)
 		self.debug('Debugging enabled for ' + stage)
+		self.stage = stage
 
 	def critical(self, msg):
 		self.__printmsg("critical", msg)
