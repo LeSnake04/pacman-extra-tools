@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-
+import traceback as tb
 from typing import Union
 
 
 class Log:
-	def __init__(self, loglevel: Union[str, int], stage: str):
+	def __init__(self, loglevel:Union[str, int], stage:str = None, traceback:bool = False, tracebacklimit:int = 2):
 		loglevelids = self.loglevelids()
 		loglevels = self.__loglevels()
 		self.loglevel = loglevel
+		self.traceback = traceback
+		self.tracebacklimit = tracebacklimit
 		self.enabledlevels = {}
 
 		if isinstance(loglevel, int):
@@ -45,7 +47,13 @@ class Log:
 
 	def __printmsg(self, msgloglevel: str, msg):
 		if self.enabledlevels[msgloglevel]:
-			print('[' + msgloglevel.upper() + '](' + self.stage + '):' + str(msg))
+			outputmsg = '[' + msgloglevel.upper() + ']'
+			if self.traceback:
+				tb.print_stack(limit=self.tracebacklimit)
+			if self.stage:
+				outputmsg += '(' + self.stage + '):'
+			outputmsg += str(msg)
+			print(outputmsg)
 
 	def loglevelids(self):
 		loglevelids = ["none", "critical", "error", "warning", "info", "verbose", "advanced", "debug"]
