@@ -1,6 +1,6 @@
 # Maintainer: LeSnake04 <dev.lesnake@posteo.de>
 pkgname=pacman-extra-tools
-pkgver=VERSION
+pkgver=
 pkgrel=1
 epoch=
 pkgdesc="Provides easy access to useful hidden pacman functions."
