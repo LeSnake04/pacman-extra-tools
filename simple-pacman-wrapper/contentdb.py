@@ -18,7 +18,7 @@ def getContent():
 			},
 			'install':{
 				'input':True,
-				'showexec':{'get':True,'force':True},
+				'dont_parse_get':{'get':True,'force':True},
 				'get':'pacman -Ssq INPUT',
 				'wild':'pacman -Ssq | grep INPUT',
 				'exec':'sudo pacman -Sy PKGS --needed',
@@ -26,7 +26,7 @@ def getContent():
 			},
 			'remove':{
 				'input':True,
-				'showexec':{'get':True},
+				'dont_parse_get':{'get':True},
 				'get':'pacman -Qsq INPUT',
 				'wild':'pacman -Qq | grep INPUT',
 				'exec':'sudo pacman -Rs PKGS'
@@ -37,8 +37,8 @@ def getContent():
 			}
 		}
 	}
-	
-	
+
+
 	content['info']['show_commands'] = '''
 After having to search for many pacman hidden functions myself, i decided to help others by giving them by giving them an easy way to use the functions i found.
 If you dont trust my program want to use the functions directly instead, you more are welcome to copy the lines from here:'''
@@ -48,47 +48,35 @@ If you dont trust my program want to use the functions directly instead, you mor
 	"""
 	def __addtocmdinfo(text:str):
 		content['info']['show_commands'] += text
+
 	for k, v in content['commands'].items():
 		basecmd = str(v['exec'])
+		print(k,v)
 		__addtocmdinfo('\n\n' + k.upper())
-		if 'get' in v or 'wild' in v or 'force' in v:
-			if 'get' in v:
-				getcmd = str(v['get'])
-				if 'showexec' in v:
-					if 'get' in v['showexec']:
+		for l, m in {'get':'Basic: ','wild':'Wildcard: ','force':'Forced: '}.items():
+			print(k,l, m)
+			if l in v:
+				if l == 'force':
+					basecmd = str(v['force'])
+				else:
+					basecmd = str(v['exec'])
+				if 'dont_parse_get' in l:
+					if l in v['dont_parse_get']:
 						cmd = basecmd.replace('PKGS', 'INPUT')
 				else:
-					cmd = basecmd.replace('PKGS', '$(' + getcmd + ')')
-			if 'wild' in v or 'force' in v:
-				__addtocmdinfo( '\n' + 'Basic: ' + cmd)
-				if 'wild' in v:
-					if 'showexec' in v:
-						wildcmd =  str(v['wild'])
-						if 'wild' in v['showexec']:
-							cmd = basecmd.replace('PKGS', 'INPUT')
-						else:
-							cmd = basecmd.replace('PKGS', '$(' + wildcmd + ')')
-					__addtocmdinfo('\n' + 'Wildcard: ' + cmd)
-				if 'force' in v:
-					forcecmd = str(v['force'])
-					if 'showexec' in v:
-						if v['showexec']['force']:
-							cmd = forcecmd.replace('PKGS', 'INPUT')
-					else:
-						cmd = forcecmd.replace('PKGS', '$(' + getcmd + ')')
-					__addtocmdinfo( '\n' + 'Force: ' + cmd)
-				if 'wild' in v and 'force' in v:
-					if 'showexec' in v:
-						if 'wild' in v['showexec']:
-							print('f+w: wild')
-							cmd = forcecmd.replace('PKGS', 'INPUT')
-					else:
-						print('f+w: else')
-						cmd = forcecmd.replace('PKGS', '$(' + v['wild'] + ')')
-					__addtocmdinfo( '\n' + 'Force+Wildcard: ' + cmd)
-			else:
-				__addtocmdinfo( '\n' + basecmd)
+					cmd = basecmd.replace('PKGS', '$(' + v[l] + ')')
+				print('Adding' + cmd)
+				__addtocmdinfo( '\n' + m + cmd)
 
+		if 'wild' in v and 'force' in v:
+			print('wild+force')
+			basecmd = str(v['force'])
+			if 'dont_parse_get' in v:
+				if 'wild' in v['dont_parse_get']:
+					cmd = basecmd.replace('PKGS', 'INPUT')
+			else:
+				cmd = basecmd.replace('PKGS', '$(' + v['wild'] + ')')
+			__addtocmdinfo( '\nForce+Wildcard: ' + cmd)
 	print(content['info']['show_commands'])
 	sys.exit()
 	return content
