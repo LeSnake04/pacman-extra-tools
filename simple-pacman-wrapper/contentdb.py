@@ -18,7 +18,7 @@ def getContent():
 			},
 			'install':{
 				'input':True,
-				'dont_parse_get':{'get':True,'force':True},
+				'dont_replace_pkgs':{'exec':True,'force':True},
 				'get':'pacman -Ssq INPUT',
 				'wild':'pacman -Ssq | grep INPUT',
 				'exec':'sudo pacman -Sy PKGS --needed',
@@ -26,7 +26,7 @@ def getContent():
 			},
 			'remove':{
 				'input':True,
-				'dont_parse_get':{'get':True},
+				'dont_replace_pkgs':{'exec':True},
 				'get':'pacman -Qsq INPUT',
 				'wild':'pacman -Qq | grep INPUT',
 				'exec':'sudo pacman -Rs PKGS'
@@ -53,26 +53,31 @@ If you dont trust my program want to use the functions directly instead, you mor
 		basecmd = str(v['exec'])
 		print(k,v)
 		__addtocmdinfo('\n\n' + k.upper())
-		for l, m in {'get':'Basic: ','wild':'Wildcard: ','force':'Forced: '}.items():
+		for l, m in {'exec':'Basic: ','wild':'Wildcard: ','force':'Forced: '}.items():
 			print(k,l, m)
 			if l in v:
 				if l == 'force':
 					basecmd = str(v['force'])
 				else:
 					basecmd = str(v['exec'])
-				if 'dont_parse_get' in l:
-					if l in v['dont_parse_get']:
+				pkgcmd = '$(' + str(v[l]) + ')'
+				if l == 'exec':
+					if 'get' in v:
+						pkgcmd = '$(' + str(v['get']) + ')'
+					else:
+						pkgcmd = ''
+				if 'dont_replace_pkgs' in v and l in v['dont_replace_pkgs']:
 						cmd = basecmd.replace('PKGS', 'INPUT')
 				else:
-					cmd = basecmd.replace('PKGS', '$(' + v[l] + ')')
+					cmd = basecmd.replace('PKGS', pkgcmd)
 				print('Adding' + cmd)
 				__addtocmdinfo( '\n' + m + cmd)
 
 		if 'wild' in v and 'force' in v:
 			print('wild+force')
 			basecmd = str(v['force'])
-			if 'dont_parse_get' in v:
-				if 'wild' in v['dont_parse_get']:
+			if 'dont_replace_pkgs' in v:
+				if 'wild' in v['dont_replace_pkgs']:
 					cmd = basecmd.replace('PKGS', 'INPUT')
 			else:
 				cmd = basecmd.replace('PKGS', '$(' + v['wild'] + ')')

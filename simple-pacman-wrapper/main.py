@@ -15,11 +15,10 @@ class Spm():
 		parser = ArgumentParser(description='Simple, yet powerfull pacman wrapper', epilog=' [*]Supports wildcard input [#]updates Package database [x]Exits Program')
 		parser.add_argument('-v', '--verbose', action ='store_true', help='Increase output verbosity')
 		parser.add_argument('-w', '--wildcard', action='store_true', help='Enable wildcard for supported commands')
-		parser.add_argument('-f', '--force', action='store_true', help='')
+		parser.add_argument('-f', '--force', action='store_true', help='Force action')
 
 		generalag = parser.add_argument_group('Genaral', 'General Package Management')
-		generalag.add_argument('-i', '--install', nargs='+', type=str, help='Install programs [*#]')
-		generalag.add_argument('-I', '--force-install', nargs='+', type=str, help='Install programs - Reinstall if already installed [*#]')
+		generalag.add_argument('-i', '--install', nargs='+', type=str, help='Install programs [*#] (Force: Reinstall if already installed)')
 		generalag.add_argument('-r', '--remove', nargs='+', type=str, help='Remove programs [*]')
 		generalag.add_argument('-a', '--autoremove', action='store_true', help='Remove unsed programs')
 		generalag.add_argument('-u', '--upgrade', action='store_true', help='Perform system upgrade [#]')
