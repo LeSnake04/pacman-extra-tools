@@ -1,87 +1,78 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-import sys
+class GetContent():
+	def content(self):
+		content = {
+			'info': {
+				'show_sources': ''' Sources/Inspirations
 
-def getContent():
-	content = {
-		'info': {
-			'show_sources': ''' Sources/Inspirations
-
-			Source of most commans: https://wiki.archlinux.org/title/Pacman/Tips_and_tricks)
-			Inspiration for wildcard implementation: https://bbs.archlinux.org/viewtopic.php?id=135649)
-			'''
-		},
-		'commands': {
-			# syntax: 'ID',['Pkglistcommand','Command']
-			'upgrade':{
-				'exec':'sudo pacman -Syu'
+				Source of most commans: https://wiki.archlinux.org/title/Pacman/Tips_and_tricks)
+				Inspiration for wildcard implementation: https://bbs.archlinux.org/viewtopic.php?id=135649)
+				'''
 			},
-			'install':{
-				'input':True,
-				'dont_replace_pkgs':{'exec':True,'force':True},
-				'get':'pacman -Ssq INPUT',
-				'wild':'pacman -Ssq | grep INPUT',
-				'exec':'sudo pacman -Sy PKGS --needed',
-				'force':'sudo pacman -Sy PKGS'
-			},
-			'remove':{
-				'input':True,
-				'dont_replace_pkgs':{'exec':True},
-				'get':'pacman -Qsq INPUT',
-				'wild':'pacman -Qq | grep INPUT',
-				'exec':'sudo pacman -Rs PKGS'
-			},
-			'autoremove':{
-				'get':'pacman -Qtdq',
-				'exec':'sudo pacman -Rs PKGS'
+			'commands': {
+				'upgrade':{
+					'exec':{
+						'base':'sudo pacman -Syu',
+						'mods':{
+							'norefresh':['y','']
+						}
+					}
+				},
+				'install':{
+					'pkgs':{
+						'base':'pacman -Ssq INPUT',
+						'mods':{
+							'wild':['INPUT','| grep INPUT']
+						}
+					},
+					'exec':{
+						'base':'sudo pacman -Sy PKGS --needed',
+						'mods':{
+							'force':[' --needed',''],
+							'norefresh':['y','']
+						}
+					}
+				},
+				'remove':{
+					'pkgs':{
+						'base':'pacman -Qsq INPUT',
+						'mods':{
+							'wild':['sq INPUT','q | grep INPUT']
+						},
+					},
+					'exec':{
+						'base':'sudo pacman -Rs PKGS'
+					}
+				},
+				'autoremove':{
+					'cmds': {
+						'pkgs':{
+							'base':'pacman -Qtdq',
+						},
+						'exec':{
+							'base':'sudo pacman -Rs PKGS'
+						}
+					}
+				}
 			}
 		}
-	}
+		return content
 
-
-	content['info']['show_commands'] = '''
-After having to search for many pacman hidden functions myself, i decided to help others by giving them by giving them an easy way to use the functions i found.
-If you dont trust my program want to use the functions directly instead, you more are welcome to copy the lines from here:'''
-
-	"""
-	Parse commandlist by goint through commands one by one,
-	"""
-	def __addtocmdinfo(text:str):
-		content['info']['show_commands'] += text
-
-	for k, v in content['commands'].items():
-		basecmd = str(v['exec'])
-		print(k,v)
-		__addtocmdinfo('\n\n' + k.upper())
-		for l, m in {'exec':'Basic: ','wild':'Wildcard: ','force':'Forced: '}.items():
-			print(k,l, m)
-			if l in v:
-				if l == 'force':
-					basecmd = str(v['force'])
-				else:
-					basecmd = str(v['exec'])
-				pkgcmd = '$(' + str(v[l]) + ')'
-				if l == 'exec':
-					if 'get' in v:
-						pkgcmd = '$(' + str(v['get']) + ')'
-					else:
-						pkgcmd = ''
-				if 'dont_replace_pkgs' in v and l in v['dont_replace_pkgs']:
-						cmd = basecmd.replace('PKGS', 'INPUT')
-				else:
-					cmd = basecmd.replace('PKGS', pkgcmd)
-				print('Adding' + cmd)
-				__addtocmdinfo( '\n' + m + cmd)
-
-		if 'wild' in v and 'force' in v:
-			print('wild+force')
-			basecmd = str(v['force'])
-			if 'dont_replace_pkgs' in v:
-				if 'wild' in v['dont_replace_pkgs']:
-					cmd = basecmd.replace('PKGS', 'INPUT')
-			else:
-				cmd = basecmd.replace('PKGS', '$(' + v['wild'] + ')')
-			__addtocmdinfo( '\nForce+Wildcard: ' + cmd)
-	print(content['info']['show_commands'])
-	sys.exit()
-	return content
+	def cfg(self):
+		cfg = {
+			'prefixtxt':'''After having to search for many pacman hidden functions myself, i decided to help others by giving them by giving them an easy way to use the functions i found.
+If you dont trust my program want to use the functions directly instead, you more are welcome to copy the lines from here:''',
+			'noreplacepkgs':{
+				'install':['base','force'],
+				'remove':['base']
+			},
+			'mods':{
+				'pkgs':{
+					'wild':'Wildcard'
+				},
+				'exec':{
+					'norefresh':'Norefresh','force':'Forced'
+				}
+			},
+			'cmdpairs':[['exec','pkgs']]
+		}
+		return cfg
