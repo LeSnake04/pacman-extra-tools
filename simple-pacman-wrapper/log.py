@@ -2,58 +2,88 @@
 # -*- coding: utf-8 -*-
 
 import traceback as tb
+import sys as s
 from typing import Union
 
-
 class Log:
-	def __init__(self, loglevel:Union[str, int], stage:str = '', traceback:bool = False, tracebacklimit:int = 2):
+	def __init__(self, loglevel:Union[str, int], subprog:str = 'main', stage:str = None, traceback:bool = False, tracebacklimit:int = 1, verbose_internal_logging:str = False):
 		loglevelids = self.loglevelids()
 		loglevels = self.__loglevels()
 		self.loglevel = loglevel
 		self.traceback = traceback
+		self.verbose_internal_logging = verbose_internal_logging
 		self.tracebacklimit = tracebacklimit
 		self.enabledlevels = {}
-
 		if isinstance(loglevel, int):
 			loglevel = loglevelids[loglevel]
-		for i in loglevels[loglevel].keys():
-			self.enabledlevels[i] = loglevels[loglevel][i]
+		for k, v in loglevels[loglevel].items():
+			self.enabledlevels[k] = v
 
-		self.stage = 'INITLOGGER'
-		self.advanced('Started logger for Stage ' + stage)
-		self.debug('Debugging enabled for ' + stage)
-		self.stage = stage
+		self.subprog = subprog.upper()
+		self.chstage('InitLogger')
+		self.advanced('Started logger for subprogram ' + subprog.upper() + ', Stage ' + stage)
+		self.__advanced('Debugging enabled for ' + stage)
+		self.chstage(stage)
 
-	def critical(self, msg):
+	def chsubprog(self, subprog:str):
+		subprog = subprog.upper()
+		self.advanced('changing to Subprogram ' + subprog)
+		self.subprog = subprog
+		return self
+
+	def chstage(self, newstage:str):
+		self.stage = 'chstage'
+		self.__advanced('Switching to stage ' + newstage )
+		self.stage = newstage
+		return self
+
+	def __advanced(self, msg):
+		if self.verbose_internal_logging:
+			self.advanced(msg)
+
+	def critical(self, *msg):
 		self.__printmsg('critical', msg)
 
-	def error(self, msg):
+	def error(self, *msg):
 		self.__printmsg('error', msg)
 
-	def warning(self, msg):
+	def warning(self, *msg):
 		self.__printmsg('warning', msg)
 
-	def info(self, msg):
+	def info(self, *msg):
 		self.__printmsg('info', msg)
 
-	def verbose(self, msg):
+	def verbose(self, *msg):
 		self.__printmsg('verbose', msg)
 
-	def advanced(self, msg):
+	def advanced(self, *msg):
 		self.__printmsg('advanced', msg)
 
-	def debug(self, msg):
+	def debug(self, *msg):
 		self.__printmsg('debug', msg)
 
-	def __printmsg(self, msgloglevel: str, msg):
+
+	def __printmsg(self, msgloglevel: str, msgin):
 		if self.enabledlevels[msgloglevel]:
+			msg = ''
+			for msgp in msgin:
+				msg += str(msgp)
+
 			outputmsg = '[' + msgloglevel.upper() + ']'
-			if self.traceback:
-				tb.print_stack(limit=self.tracebacklimit)
+
+			if self.subprog:
+				outputmsg += '{' + self.subprog + '}'
+
 			if self.stage:
-				outputmsg += '(' + self.stage + '):'
-			outputmsg += str(msg)
+				outputmsg += '(' + self.stage + ')'
+			outputmsg += ': ' + str(msg)
 			print(outputmsg)
+
+			if self.traceback:
+				tblist = list(reversed(tb.format_list(tb.extract_stack())))
+				for i in range(self.tracebacklimit-0):
+					print(tblist[2+i])
+			
 
 	def loglevelids(self):
 		loglevelids = ['none', 'critical', 'error', 'warning', 'info', 'verbose', 'advanced', 'debug']
